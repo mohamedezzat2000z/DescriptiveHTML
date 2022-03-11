@@ -11,9 +11,9 @@ public interface WriteConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int word = 21;
+  int word = 23;
   /** RegularExpression Id. */
-  int NUM = 22;
+  int NUM = 24;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -41,6 +41,8 @@ public interface WriteConstants {
     "\"FONT\"",
     "\"http\"",
     "\"com\"",
+    "\"AND\"",
+    "\"WITH LINK\"",
     "<word>",
     "<NUM>",
   };

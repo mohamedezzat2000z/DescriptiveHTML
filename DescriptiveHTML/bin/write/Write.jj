@@ -18,7 +18,7 @@ PARSER_END(Write)
 
 SKIP:  { " " | "\t" | "\n" | "\r"}
 TOKEN: { "/" | ":" | "“" |"." }
-TOKEN: { "PARAGRAPH"| "IMAGE" | "WITH" | "SOURCE" | "ADD" |	"HEADING" |  "LINK" | "TEXT" | "COLOR" |  "FONT"| "http" | "com"}
+TOKEN: { "PARAGRAPH"| "IMAGE" | "WITH" | "SOURCE" | "ADD" |	"HEADING" |  "LINK" | "TEXT" | "COLOR" |  "FONT"| "http" | "com" |"AND" | "WITH LINK"}
 TOKEN [IGNORE_CASE] : { <word: (["a"-"z"])+> }
 TOKEN: { <NUM: (["0"-"9"])+> }
 
@@ -80,7 +80,7 @@ void  apha():
 void decorated_text():
 {}
 {
-  "WITH" (text() |  color() |  font() )
+	  "WITH" (text() |  color() |  font() )
 }
 
 void text():
@@ -104,5 +104,5 @@ void font():
 void decorated_url():
 {}
 {
-  "http" ":" "/" "/" <word> "." "com"
+  "TEXT" <word> "AND" "WITH LINK" "http" ":" "/" "/" <word> "." "com" (decorated_text())*
 }
