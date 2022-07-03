@@ -11,9 +11,9 @@ public interface WriteConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int word = 23;
+  int word = 21;
   /** RegularExpression Id. */
-  int NUM = 24;
+  int NUM = 22;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -23,12 +23,12 @@ public interface WriteConstants {
     "<EOF>",
     "\" \"",
     "\"\\t\"",
-    "\"\\n\"",
     "\"\\r\"",
     "\"/\"",
     "\":\"",
-    "\"\\u201c\"",
+    "\"\\\"\"",
     "\".\"",
+    "\"_\"",
     "\"PARAGRAPH\"",
     "\"IMAGE\"",
     "\"WITH\"",
@@ -39,12 +39,11 @@ public interface WriteConstants {
     "\"TEXT\"",
     "\"COLOR\"",
     "\"FONT\"",
-    "\"http\"",
-    "\"com\"",
     "\"AND\"",
     "\"WITH LINK\"",
     "<word>",
     "<NUM>",
+    "\"\\n\"",
   };
 
 }

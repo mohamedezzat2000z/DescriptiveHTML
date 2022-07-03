@@ -1,13 +1,19 @@
+
+options
+{
+  static = false;
+}
+
 PARSER_BEGIN(Write)
 package write;
 
-import java.io.StringReader;
+
 
 public class Write {
   
     public static void main(String[] args) throws Exception {
-      StringReader in=new StringReader("");
-      Write write=new Write(in);
+
+      Write write=new Write(System.in);
       write.create();
     }
     
@@ -16,12 +22,18 @@ public class Write {
 PARSER_END(Write)
 
 
-SKIP:  { " " | "\t" | "\n" | "\r"}
-TOKEN: { "/" | ":" | "“" |"." }
-TOKEN: { "PARAGRAPH"| "IMAGE" | "WITH" | "SOURCE" | "ADD" |	"HEADING" |  "LINK" | "TEXT" | "COLOR" |  "FONT"| "http" | "com" |"AND" | "WITH LINK"}
+SKIP:  { " " | "\t" | "\r"}
+TOKEN: { "/" | ":" | "\"" |"."|"_" }
+TOKEN: { "PARAGRAPH"| "IMAGE" | "WITH" | "SOURCE" | "ADD" |	"HEADING" |  "LINK" | "TEXT" | "COLOR" |  "FONT" |"AND" | "WITH LINK"}
 TOKEN [IGNORE_CASE] : { <word: (["a"-"z"])+> }
 TOKEN: { <NUM: (["0"-"9"])+> }
 
+void start():
+{}
+{
+	create() "\n"
+	
+}
 
 void create():
 {}
@@ -62,33 +74,36 @@ void url():
 void  quote():
 {}
 {
- 	"“"
+ 	"\""
 }
 
 void sentence():
 {}
 {
-  (apha())*
+	 (apha())*
 }
-
 void  apha():
 {}
 {
- 	"/" | ":" |"."| <NUM> | <word> 
+ 	"/" | ":" |"."|"_"| <NUM> | <word>
 }
 
 void decorated_text():
 {}
 {
-	  "WITH" (text() |  color() |  font() )
+	  decorated_textDash() ("AND" decorated_textDash())* 
 }
 
+void decorated_textDash():
+{}
+{
+	"WITH" (text() |  color() |  font() )
+}
 void text():
 {}
 {
   "TEXT" quote() sentence() quote()
 }
-
 void color():
 {}
 {
@@ -101,8 +116,9 @@ void font():
    "FONT" quote() sentence() quote()
 }
 
+
 void decorated_url():
 {}
 {
-  "TEXT" <word> "AND" "WITH LINK" "http" ":" "/" "/" <word> "." "com" (decorated_text())*
+  "WITH" "TEXT" quote() sentence() quote() "AND" "WITH LINK" quote() sentence() quote() (decorated_text())*
 }
