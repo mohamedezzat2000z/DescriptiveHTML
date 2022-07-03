@@ -1,0 +1,118 @@
+PARSER_BEGIN(Write)
+package write;
+
+
+
+public class Write {
+  
+    public static void main(String[] args) throws Exception {
+
+      Write write=new Write(System.in);
+      write.create();
+    }
+    
+}
+
+PARSER_END(Write)
+
+
+SKIP:  { " " | "\t" | "\r"}
+TOKEN: { "/" | ":" | "\"" |"."|"_" }
+TOKEN: { "PARAGRAPH"| "IMAGE" | "WITH" | "SOURCE" | "ADD" |	"HEADING" |  "LINK" | "TEXT" | "COLOR" |  "FONT" |"AND" | "WITH LINK"}
+TOKEN [IGNORE_CASE] : { <word: (["a"-"z"])+> }
+TOKEN: { <NUM: (["0"-"9"])+> }
+
+int start():
+{}
+{
+	create() "\n"
+	{ return 0; }
+}
+
+void create():
+{}
+{
+  "ADD" element()
+}
+
+void element():
+{}
+{
+	img() | header() | para() | url()
+}
+
+void img():
+{}
+{
+  "IMAGE" "WITH" "SOURCE"  quote() sentence() quote()
+}
+
+void header():
+{}
+{
+  "HEADING" decorated_text()
+}
+
+void para():
+{}
+{
+  "PARAGRAPH" decorated_text()
+}
+
+void url():
+{}
+{
+  "LINK" decorated_url()
+}
+
+void  quote():
+{}
+{
+ 	"\""
+}
+
+void sentence():
+{}
+{
+	 (apha())*
+}
+void  apha():
+{}
+{
+ 	"/" | ":" |"."|"_"| <NUM> | <word>
+}
+
+void decorated_text():
+{}
+{
+	  decorated_textDash() ("AND" decorated_textDash())* 
+}
+
+void decorated_textDash():
+{}
+{
+	"WITH" (text() |  color() |  font() )
+}
+void text():
+{}
+{
+  "TEXT" quote() sentence() quote()
+}
+void color():
+{}
+{
+   "COLOR" quote() sentence() quote()
+}
+
+void font():
+{}
+{
+   "FONT" quote() sentence() quote()
+}
+
+
+void decorated_url():
+{}
+{
+  "WITH" "TEXT" quote() sentence() quote() "AND" "WITH LINK" quote() sentence() quote() (decorated_text())*
+}

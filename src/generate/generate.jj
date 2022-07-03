@@ -1,0 +1,149 @@
+PARSER_BEGIN(Generate)
+package generate;
+
+import java.io.StringReader;
+
+public class Generate {
+  
+    public static void main(String[] args) throws Exception {
+      StringReader in=new StringReader("");
+      Generate generator=new Generate(in);
+      StringBuilder sb = new StringBuilder();
+      generator.create(sb);              
+	}   
+}
+
+PARSER_END(Generate)
+
+
+SKIP:  {"\t"| "\r"}
+TOKEN: { "/" | ":" | "'" |"."|"_" |" "|"\""|"\" "|"\n"}
+TOKEN: { "PARAGRAPH "| "IMAGE " | "WITH " | "SOURCE " | "ADD " | "HEADING " | "LINK " | "TEXT " | "COLOR " |  "FONT " |"AND " | "WITH LINK " }
+TOKEN [IGNORE_CASE] : { <word: (["a"-"z"])+> }
+TOKEN: { <NUM: (["0"-"9"])+> }
+void create(StringBuilder sb):
+{}
+{
+	"ADD " element(sb) {sb.append("\n");} "\n" { return; }
+}
+
+void element(StringBuilder sb): { } {
+  
+	img(sb) 
+  | header(sb) 
+  | para(sb)
+  | url(sb)
+ 
+}
+
+void img(StringBuilder sb): {StringBuilder sb1 = new StringBuilder(); } {
+  "IMAGE " "WITH " "SOURCE "
+  "\""sentence(sb1)
+   {sb.append("< img src =");
+  		   sb.append('"' );
+  		   sb.append(sb1.toString());
+  		   System.out.print(sb1.toString());
+  		   sb.append('"');
+  		   sb.append(" />");
+  	}
+  	"\""
+}
+
+void header(StringBuilder sb): { } {
+  "HEADING " {sb.append("<h1 >");} decorated_text(sb) {sb.append("</h1>");} 
+}
+
+void para(StringBuilder sb):{ } {
+  "PARAGRAPH "{sb.append("<p >");} decorated_text(sb) { sb.append("</p>");}
+}
+
+void url(StringBuilder sb):{ } {
+  "LINK "{sb.append("<a >");} decorated_url(sb) {sb.append("</a>" ); }
+}
+
+
+void sentence(StringBuilder sb):{}{
+  
+  {} (apha(sb))*
+}
+
+void  apha(StringBuilder sb):{ Token y;} {
+	y="/" { sb.append(y.toString()); }
+	|y=":" { sb.append(y.toString()); }
+	|y="."{ sb.append(y.toString()); }
+	|y="_"{ sb.append(y.toString()); }
+	| y=<NUM>{ sb.append(y.toString()); }
+	| y=<word>{ sb.append(y.toString()); }
+	| y=" " { sb.append(y.toString()); }
+}
+
+void decorated_text(StringBuilder sb):
+{}
+{
+	  decorated_textDash(sb) ("AND " decorated_textDash(sb))* 
+}
+void decorated_textDash(StringBuilder sb):{ } {
+  "WITH " (text(sb)|color(sb) |font(sb))
+}
+
+void text(StringBuilder sb):{} {
+  "TEXT " "\"" 
+   		 sentence(sb) 
+    	 ("\" " |"\"")
+}
+void color(StringBuilder sb):
+{StringBuilder sb1 = new StringBuilder(); }
+{
+   "COLOR "
+    "\""
+    sentence(sb1)
+    {  
+    if(sb.indexOf("style="+'"',0) == -1) {
+  	  	  System.out.print(sb.toString()+"\n");
+    		sb.insert(sb.indexOf(">"), "style="+'"'+'"');
+    }
+    System.out.print(sb.toString()+"\n");
+    sb.insert(sb.indexOf("style="+'"')+7,"color:"+sb1.toString()+";");
+    }
+    ("\" " |"\"")
+}
+
+void font(StringBuilder sb):{StringBuilder sb1 = new StringBuilder(); } {
+   "FONT "
+   "\""
+   sentence(sb1)
+        {
+        if(sb.indexOf("style="+'"',0) == -1) {
+    	  System.out.print(sb.toString()+"\n");
+    		sb.insert(sb.indexOf(">"), "style="+'"'+'"');
+    	}
+    	System.out.print(sb.toString()+"\n");
+    	sb.insert(sb.indexOf("style="+'"')+7,"font-family:"+sb1.toString()+";"); 
+     }
+     ("\" " |"\"")
+}
+
+void decorated_url(StringBuilder sb):{StringBuilder sb1 = new StringBuilder();} {
+	"WITH "
+ 	"TEXT "
+ 	("\" " | "\""){ sb.append(">");}
+  	sentence(sb) 
+  	("\" " | "\"")
+  	
+    "AND "
+    "WITH LINK "
+    ("\" " | "\"")
+    sentence(sb1) {
+        if(sb.indexOf("src="+'"',0) == -1) {
+    	  System.out.print(sb.toString()+"\n");
+    		sb.insert(sb.indexOf(">"), "src="+'"'+'"');
+    	}
+    	System.out.print(sb.toString()+"\n");
+    	sb.insert(sb.indexOf("="+'"')+2,sb1.toString()); 
+     }
+     ("\" " | "\"")
+     (decorated_text(sb))*
+}
+
+
+
